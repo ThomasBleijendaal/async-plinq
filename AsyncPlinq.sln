@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncPlinq", "AsyncPlinq\AsyncPlinq.csproj", "{2D2A52CE-E96A-4C36-AB2D-8EAE630C8287}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncPlinq.Tests", "AsyncPlinq.Tests\AsyncPlinq.Tests.csproj", "{F50AA084-A4A2-4F70-AEC5-B6BD3B81E2D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D2A52CE-E96A-4C36-AB2D-8EAE630C8287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D2A52CE-E96A-4C36-AB2D-8EAE630C8287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D2A52CE-E96A-4C36-AB2D-8EAE630C8287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D2A52CE-E96A-4C36-AB2D-8EAE630C8287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F50AA084-A4A2-4F70-AEC5-B6BD3B81E2D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F50AA084-A4A2-4F70-AEC5-B6BD3B81E2D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F50AA084-A4A2-4F70-AEC5-B6BD3B81E2D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F50AA084-A4A2-4F70-AEC5-B6BD3B81E2D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8CFE93A0-660F-4475-A50C-654813F7A2FD}
+	EndGlobalSection
+EndGlobal
