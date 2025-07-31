@@ -4,64 +4,34 @@ public static partial class AsyncPlinqExtensions
 {
     extension<TInput>(IEnumerable<TInput> source)
     {
-        public IEnumerable<Task<TResult>> SelectAsync<TResult>(Func<TInput, Task<TResult>> selector, int? maxDegreeOfParallelism = null)
+        public IAsyncEnumerable<TResult> SelectAsync<TResult>(Func<TInput, Task<TResult>> selector, int? maxDegreeOfParallelism = null)
         {
-            using var semaphore = new SemaphoreSlim(maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism);
+            var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);
 
-            var results = ExecuteWithSemaphore(source, selector, maxDegreeOfParallelism);
+            var enumerable = PipelineBuilder.CreateEnumerable(source, transform);
 
-            return results.Select(Snd);
-        }
-    }
-
-    extension<TInput>(IEnumerable<Task<TInput>> source)
-    {
-        public IEnumerable<Task<TResult>> SelectAsync<TResult>(Func<TInput, TResult> selector, int? maxDegreeOfParallelism = null)
-        {
-            using var semaphore = new SemaphoreSlim(maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism);
-
-            var results = ExecuteWithSemaphore(source, async (input) =>
-            {
-                var data = await input;
-                return selector.Invoke(data);
-            }, maxDegreeOfParallelism);
-
-            return results.Select(Snd);
-        }
-
-        public IEnumerable<Task<TResult>> SelectAsync<TResult>(Func<TInput, Task<TResult>> selector, int? maxDegreeOfParallelism = null)
-        {
-            using var semaphore = new SemaphoreSlim(maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism);
-
-            var results = ExecuteWithSemaphore(source, async (input) =>
-            {
-                var data = await input;
-                return await selector.Invoke(data);
-            }, maxDegreeOfParallelism);
-
-            return results.Select(Snd);
+            return enumerable;
         }
     }
 
     extension<TInput>(IAsyncEnumerable<TInput> source)
     {
-        // TODO
-        //public async Task<IEnumerable<TResult>> SelectAsync<TResult>(Func<TInput, TResult> selector, int? maxDegreeOfParallelism = null)
-        //{
-        //    using var semaphore = new SemaphoreSlim(maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism);
-
-        //    var results = await ExecuteWithSemaphoreAsync(source, selector, maxDegreeOfParallelism);
-
-        //    return results.Select(Snd);
-        //}
-
-        public async Task<IEnumerable<TResult>> SelectAsync<TResult>(Func<TInput, Task<TResult>> selector, int? maxDegreeOfParallelism = null)
+        public IAsyncEnumerable<TResult> SelectAsync<TResult>(Func<TInput, TResult> selector, int? maxDegreeOfParallelism = null)
         {
-            using var semaphore = new SemaphoreSlim(maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism);
+            var transform = BlockBuilder.Create(selector.MakeAsync(), maxDegreeOfParallelism);
 
-            var results = await ExecuteWithSemaphoreAsync(source, selector, maxDegreeOfParallelism);
+            var enumerable = PipelineBuilder.CreateEnumerable(source, transform);
 
-            return results.Select(Snd);
+            return enumerable;
+        }
+
+        public IAsyncEnumerable<TResult> SelectAsync<TResult>(Func<TInput, Task<TResult>> selector, int? maxDegreeOfParallelism = null)
+        {
+            var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);
+
+            var enumerable = PipelineBuilder.CreateEnumerable(source, transform);
+
+            return enumerable;
         }
     }
 }
