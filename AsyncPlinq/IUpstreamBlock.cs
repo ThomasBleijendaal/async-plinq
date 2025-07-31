@@ -1,6 +1,6 @@
 ﻿namespace AsyncPlinq;
 
-internal interface IUpstreamBlock
+internal interface IUpstreamBlock : IAsyncDisposable
 {
     void Complete();
 }

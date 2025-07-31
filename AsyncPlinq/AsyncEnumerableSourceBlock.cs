@@ -5,28 +5,42 @@ namespace AsyncPlinq;
 internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 {
     private readonly IAsyncEnumerable<T> _source;
-    private readonly TaskCompletionSource _cts = new();
+
+    private readonly TaskCompletionSource _tcs;
+    private readonly CancellationTokenSource _cts;
+
     private ITargetBlock<T>? _target;
 
     public AsyncEnumerableSourceBlock(
-        IAsyncEnumerable<T> source)
+        IAsyncEnumerable<T> source,
+        CancellationToken token)
     {
         _source = source;
 
-        Completion = _cts.Task;
+        _tcs = new();
+        Completion = _tcs.Task;
+
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
     }
 
     public Task Completion { get; private set; }
 
     public void Complete()
     {
-        lock (_cts)
+        lock (_tcs)
         {
-            if (Completion == _cts.Task)
+            if (Completion == _tcs.Task)
             {
                 Completion = ReadEnumerableAsync();
             }
         }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _cts.Cancel();
+
+        return ValueTask.CompletedTask;
     }
 
     public T? ConsumeMessage(DataflowMessageHeader messageHeader, ITargetBlock<T> target, out bool messageConsumed)
@@ -37,7 +51,7 @@ internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 
     public void Fault(Exception exception)
     {
-        _cts.SetException(exception);
+        _tcs.SetException(exception);
     }
 
     public IDisposable LinkTo(ITargetBlock<T> target, DataflowLinkOptions linkOptions)
@@ -63,13 +77,13 @@ internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
             throw new InvalidOperationException("No target");
         }
 
-        await foreach (var item in _source)
+        await foreach (var item in _source.WithCancellation(_cts.Token))
         {
-            _target.Post(item);
+            await _target.SendAsync(item);
         }
 
         _target.Complete();
 
-        _cts.SetResult();
+        _tcs.SetResult();
     }
 }

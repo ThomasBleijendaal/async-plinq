@@ -10,7 +10,8 @@ internal static class BlockBuilder
     {
         var transform = new TransformBlock<TInput, TOutput>(selector, new()
         {
-            MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism
+            MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
+            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
         });
 
         return new(transform, transform);
@@ -28,10 +29,12 @@ internal static class BlockBuilder
             },
             new()
             {
-                MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism
+                MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
+                BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
             });
 
         var transform2 = new TransformBlock<(bool, TInput), TInput>(AsyncPlinqExtensions.Snd);
+
         var noAction = new ActionBlock<(bool, TInput)>((_) => { });
 
         transform.LinkTo(transform2, BlockOptions.DefaultOptions, AsyncPlinqExtensions.Fst);

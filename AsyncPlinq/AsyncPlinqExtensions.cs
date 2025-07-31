@@ -4,6 +4,7 @@
  * TODO: cancellation tokens everywhere
  * TODO: find way to not collide with async linq implementations
  * TODO: more overloads link async linq (index etc)
+ * TODO: find way to incorporate WhenAllAsync
  */
 
 

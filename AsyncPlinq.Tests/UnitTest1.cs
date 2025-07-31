@@ -8,8 +8,10 @@ public class UnitTest1
 
     private readonly Func<int, int> _syncSelector = i => { return i + 1; };
     private readonly Func<int, Task<int>> _asyncSelector = async i => { await Task.Delay(1000); return i + 1; };
+    private readonly Func<int, CancellationToken, ValueTask<int>> _asyncSelectorCt = async (i, ct) => { await Task.Delay(1000); return i + 1; };
     private readonly Func<int, bool> _syncPredicate = i => { return i % 2 == 0; };
     private readonly Func<int, Task<bool>> _asyncPredicate = async i => { await Task.Delay(1000); return i % 2 == 0; };
+    private readonly Func<int, CancellationToken, ValueTask<bool>> _asyncPredicateCt = async (i, ct) => { await Task.Delay(1000); return i % 2 == 0; };
 
     public UnitTest1(ITestOutputHelper output)
     {
@@ -121,6 +123,32 @@ public class UnitTest1
     }
 
     [Fact]
+    public async Task SelectWhereTest2Async()
+    {
+        int[] input = [1, 2, 3, 4, 5, 6, 7, 8];
+
+        var output = input.SelectAsync(_asyncSelector, maxDegreeOfParallelism: 2).WhereAsync(_asyncPredicate, maxDegreeOfParallelism: 2);
+
+        await foreach (var item in output)
+        {
+            _output.WriteLine(item.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task SelectWhereTest2AsyncLinqAsync()
+    {
+        int[] input = [1, 2, 3, 4];
+
+        var output = input.ToAsyncEnumerable().Select(_asyncSelectorCt).Where(_asyncPredicateCt);
+
+        await foreach (var item in output)
+        {
+            _output.WriteLine(item.ToString());
+        }
+    }
+
+    [Fact]
     public async Task SelectWhereToArrayTestAsync()
     {
         int[] input = [1, 2, 3, 4];
@@ -133,5 +161,35 @@ public class UnitTest1
         {
             _output.WriteLine(item.ToString());
         }
+    }
+
+    [Fact]
+    public async Task SelectWhereFirstTestAsync()
+    {
+        int[] input = [1, 2, 3, 4];
+
+        var output = await input.SelectAsync(_asyncSelector).WhereAsync(_asyncPredicate).FirstOrDefaultAsync();
+
+        Assert.True(output == 2);
+    }
+
+    [Fact]
+    public async Task SelectWhereFirst2TestAsync()
+    {
+        var output = await InfiniteItems().SelectAsync(_asyncSelector).WhereAsync(_asyncPredicate).FirstOrDefaultAsync();
+
+        Assert.True(output == 2);
+    }
+
+    private IEnumerable<int> InfiniteItems()
+    {
+        var i = 0;
+
+        do
+        {
+            _output.WriteLine(i.ToString());
+            yield return ++i;
+        }
+        while (true);
     }
 }

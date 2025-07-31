@@ -48,13 +48,16 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
         private set => _current = value;
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         _current = default;
 
         SourceBlock.Complete();
 
-        return ValueTask.CompletedTask;
+        if (_upstreamBlock != null)
+        {
+            await _upstreamBlock.DisposeAsync().ConfigureAwait(false);
+        }
     }
 
     public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)

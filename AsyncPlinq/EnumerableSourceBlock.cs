@@ -5,28 +5,42 @@ namespace AsyncPlinq;
 internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 {
     private readonly IEnumerable<T> _source;
-    private readonly TaskCompletionSource _cts = new();
+
+    private readonly TaskCompletionSource _tcs;
+    private readonly CancellationTokenSource _cts;
+
     private ITargetBlock<T>? _target;
 
     public EnumerableSourceBlock(
-        IEnumerable<T> source)
+        IEnumerable<T> source,
+        CancellationToken token)
     {
         _source = source;
 
-        Completion = _cts.Task;
+        _tcs = new();
+        Completion = _tcs.Task;
+
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
     }
 
     public Task Completion { get; private set; }
 
     public void Complete()
     {
-        lock (_cts)
+        lock (_tcs)
         {
-            if (!Completion.IsCompleted)
+            if (Completion == _tcs.Task)
             {
-                ReadEnumerable();
+                Completion = ReadEnumerableAsync();
             }
         }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _cts.Cancel();
+
+        return ValueTask.CompletedTask;
     }
 
     public T? ConsumeMessage(DataflowMessageHeader messageHeader, ITargetBlock<T> target, out bool messageConsumed)
@@ -37,7 +51,7 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 
     public void Fault(Exception exception)
     {
-        _cts.SetException(exception);
+        _tcs.SetException(exception);
     }
 
     public IDisposable LinkTo(ITargetBlock<T> target, DataflowLinkOptions linkOptions)
@@ -56,7 +70,7 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
         return false;
     }
 
-    private void ReadEnumerable()
+    private async Task ReadEnumerableAsync()
     {
         if (_target == null)
         {
@@ -65,11 +79,11 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 
         foreach (var item in _source)
         {
-            _target.Post(item);
+            await _target.SendAsync(item);
         }
 
         _target.Complete();
 
-        _cts.SetResult();
+        _tcs.SetResult();
     }
 }
