@@ -2,4 +2,8 @@
 
 namespace AsyncPlinq;
 
-internal record Block<TInput, TOutput>(ITargetBlock<TInput> Input, ISourceBlock<TOutput> Output);
+internal record struct BlockData<T>(T Data, int Index);
+
+internal record Block<TInput, TOutput>(
+    ITargetBlock<BlockData<TInput>> Input,
+    ISourceBlock<BlockData<TOutput>> Output);

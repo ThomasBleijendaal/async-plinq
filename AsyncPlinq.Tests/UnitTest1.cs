@@ -2,6 +2,33 @@
 
 namespace AsyncPlinq.Tests;
 
+[Collection("2")]
+public class UnitTest2
+{
+    private readonly ITestOutputHelper _output;
+
+    private readonly Func<int, Task<int>> _asyncSelector = async i => { await Task.Delay(1000); return i + 1; };
+
+    public UnitTest2(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
+    [Fact]
+    public async Task SelectTestAsync()
+    {
+        int[] input = [1, 2, 3, 4];
+
+        var output = input.SelectAsync(_asyncSelector);
+
+        await foreach (var item in output)
+        {
+            _output.WriteLine(item.ToString());
+        }
+    }
+}
+
+[Collection("1")]
 public class UnitTest1
 {
     private readonly ITestOutputHelper _output;

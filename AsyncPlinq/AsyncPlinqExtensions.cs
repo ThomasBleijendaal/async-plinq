@@ -2,11 +2,13 @@
 
 /*
  * TODO: cancellation tokens everywhere
- * TODO: find way to not collide with async linq implementations
  * TODO: more overloads link async linq (index etc)
  * TODO: find way to incorporate WhenAllAsync
+ * TODO: improve disposing of where blocks - implement custom where block
+ * TODO: parallelize tests
+ * TODO: implement source block for IEnumerable<Task<IEnumerable<T>>>
+ * TODO: ConfigureAwait
  */
-
 
 public static partial class AsyncPlinqExtensions
 {
