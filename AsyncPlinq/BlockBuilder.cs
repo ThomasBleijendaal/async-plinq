@@ -8,7 +8,20 @@ internal static class BlockBuilder
         Func<TInput, Task<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var transform = new TransformBlock<TInput, TOutput>(selector, new()
+        var transform = new TransformBlock<BlockData<TInput>, BlockData<TOutput>>(selector.WithIndex(), new()
+        {
+            MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
+            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
+        });
+
+        return new(transform, transform);
+    }
+
+    public static Block<TInput, TOutput> Create<TInput, TOutput>(
+        Func<TInput, int, Task<TOutput>> selector,
+        int? maxDegreeOfParallelism = null)
+    {
+        var transform = new TransformBlock<BlockData<TInput>, BlockData<TOutput>>(selector.Wrap(), new()
         {
             MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
             BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)

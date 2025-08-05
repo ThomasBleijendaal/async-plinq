@@ -8,8 +8,14 @@ public static partial class AsyncPlinqExtensions
             Func<TInput, Task<TResult>> selector,
             int? maxDegreeOfParallelism = null,
             CancellationToken? token = null)
+            => source.SelectAsync(selector.WithIndex(), maxDegreeOfParallelism, token);
+
+        public IAsyncEnumerable<TResult> SelectAsync<TResult>(
+            Func<TInput, int, Task<TResult>> selector,
+            int? maxDegreeOfParallelism = null,
+            CancellationToken? token = null)
         {
-            var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);
+            var transform = BlockBuilder.Create(selector.Wrap(), maxDegreeOfParallelism);
 
             var enumerable = PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
 

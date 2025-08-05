@@ -17,6 +17,18 @@ public static partial class AsyncPlinqExtensions
 
     internal static bool NotFst<T2>((bool t1, T2 t2) input) => !input.t1;
 
+    internal static Func<BlockData<TInput>, BlockData<TOutput>> Wrap<TInput, TOutput>(this Func<TInput, int, TOutput> method)
+        => input => new(method.Invoke(input.Data, input.Index), input.Index);
+
+    internal static Func<BlockData<TInput>, BlockData<TOutput>> WithIndex<TInput, TOutput>(this Func<TInput, TOutput> method)
+        => input => new(method.Invoke(input.Data), input.Index);
+
+    internal static Func<BlockData<TInput>, Task<BlockData<TOutput>>> Wrap<TInput, TOutput>(this Func<TInput, int, Task<TOutput>> method)
+        => async input => new(await method.Invoke(input.Data, input.Index), input.Index);
+
+    internal static Func<BlockData<TInput>, Task<BlockData<TOutput>>> WithIndex<TInput, TOutput>(this Func<TInput, Task<TOutput>> method)
+        => async input => new(await method.Invoke(input.Data), input.Index);
+
     internal static Func<TInput, Task<TOutput>> MakeAsync<TInput, TOutput>(this Func<TInput, TOutput> method)
         => input => Task.FromResult(method.Invoke(input));
 }
