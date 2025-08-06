@@ -2,7 +2,6 @@
 
 /*
  * TODO: cancellation tokens everywhere
- * TODO: more overloads link async linq (index etc)
  * TODO: find way to incorporate WhenAllAsync
  * TODO: improve disposing of where blocks - implement custom where block
  * TODO: parallelize tests
@@ -17,18 +16,9 @@ public static partial class AsyncPlinqExtensions
 
     internal static bool NotFst<T2>((bool t1, T2 t2) input) => !input.t1;
 
-    internal static Func<BlockData<TInput>, BlockData<TOutput>> Wrap<TInput, TOutput>(this Func<TInput, int, TOutput> method)
-        => input => new(method.Invoke(input.Data, input.Index), input.Index);
-
-    internal static Func<BlockData<TInput>, BlockData<TOutput>> WithIndex<TInput, TOutput>(this Func<TInput, TOutput> method)
-        => input => new(method.Invoke(input.Data), input.Index);
-
-    internal static Func<BlockData<TInput>, Task<BlockData<TOutput>>> Wrap<TInput, TOutput>(this Func<TInput, int, Task<TOutput>> method)
-        => async input => new(await method.Invoke(input.Data, input.Index), input.Index);
-
-    internal static Func<BlockData<TInput>, Task<BlockData<TOutput>>> WithIndex<TInput, TOutput>(this Func<TInput, Task<TOutput>> method)
-        => async input => new(await method.Invoke(input.Data), input.Index);
-
     internal static Func<TInput, Task<TOutput>> MakeAsync<TInput, TOutput>(this Func<TInput, TOutput> method)
         => input => Task.FromResult(method.Invoke(input));
+
+    internal static Func<TInput1, TInput2, Task<TOutput>> MakeAsync<TInput1, TInput2, TOutput>(this Func<TInput1, TInput2, TOutput> method)
+        => (input1, input2) => Task.FromResult(method.Invoke(input1, input2));
 }

@@ -35,9 +35,11 @@ public class UnitTest1
 
     private readonly Func<int, int> _syncSelector = i => { return i + 1; };
     private readonly Func<int, Task<int>> _asyncSelector = async i => { await Task.Delay(1000); return i + 1; };
+    private readonly Func<int, int, Task<int>> _asyncSelectorIx = async (i, index) => { await Task.Delay(1000); return ((i + 1) * 1000) + index; };
     private readonly Func<int, CancellationToken, ValueTask<int>> _asyncSelectorCt = async (i, ct) => { await Task.Delay(1000); return i + 1; };
     private readonly Func<int, bool> _syncPredicate = i => { return i % 2 == 0; };
     private readonly Func<int, Task<bool>> _asyncPredicate = async i => { await Task.Delay(1000); return i % 2 == 0; };
+    private readonly Func<int, int, Task<bool>> _asyncPredicateIx = async (i, index) => { await Task.Delay(1000); return (((i + 1) * 1000) + index) % 2 == 0; };
     private readonly Func<int, CancellationToken, ValueTask<bool>> _asyncPredicateCt = async (i, ct) => { await Task.Delay(1000); return i % 2 == 0; };
 
     public UnitTest1(ITestOutputHelper output)
@@ -51,6 +53,19 @@ public class UnitTest1
         int[] input = [1, 2, 3, 4];
 
         var output = input.SelectAsync(_asyncSelector);
+
+        await foreach (var item in output)
+        {
+            _output.WriteLine(item.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task SelectIndexTestAsync()
+    {
+        int[] input = [1, 2, 3, 4];
+
+        var output = input.SelectAsync(_asyncSelectorIx);
 
         await foreach (var item in output)
         {
@@ -142,6 +157,19 @@ public class UnitTest1
         int[] input = [1, 2, 3, 4];
 
         var output = input.SelectAsync(_asyncSelector).WhereAsync(_asyncPredicate);
+
+        await foreach (var item in output)
+        {
+            _output.WriteLine(item.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task SelectWhereIndexTestAsync()
+    {
+        int[] input = [1, 2, 3, 4];
+
+        var output = input.SelectAsync(_asyncSelectorIx).WhereAsync(_asyncPredicateIx);
 
         await foreach (var item in output)
         {

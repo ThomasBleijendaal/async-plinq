@@ -8,7 +8,7 @@ internal static class BlockBuilder
         Func<TInput, Task<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var transform = new TransformBlock<BlockData<TInput>, BlockData<TOutput>>(selector.WithIndex(), new()
+        var transform = new TransformBlock<TInput, TOutput>(selector, new()
         {
             MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
             BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
@@ -21,13 +21,9 @@ internal static class BlockBuilder
         Func<TInput, int, Task<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var transform = new TransformBlock<BlockData<TInput>, BlockData<TOutput>>(selector.Wrap(), new()
-        {
-            MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
-            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
-        });
+        var funcCounter = new FuncCounter<TInput, TOutput>(selector);
 
-        return new(transform, transform);
+        return Create<TInput, TOutput>(funcCounter.InvokeAsync, maxDegreeOfParallelism);
     }
 
     public static Block<TInput, TInput> Create<TInput>(
@@ -54,5 +50,14 @@ internal static class BlockBuilder
         transform.LinkTo(noAction, BlockOptions.DefaultOptions, AsyncPlinqExtensions.NotFst);
 
         return new(transform, transform2);
+    }
+
+    public static Block<TInput, TInput> Create<TInput>(
+        Func<TInput, int, Task<bool>> predicate,
+        int? maxDegreeOfParallelism = null)
+    {
+        var funcCounter = new FuncCounter<TInput, bool>(predicate);
+
+        return Create<TInput>(funcCounter.InvokeAsync, maxDegreeOfParallelism);
     }
 }
