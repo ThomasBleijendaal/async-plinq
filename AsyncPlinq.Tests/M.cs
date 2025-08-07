@@ -45,4 +45,30 @@ public static class M
         }
         while (true);
     }
+
+    public static async IAsyncEnumerable<int> AsyncProducerAsync(int i)
+    {
+        await foreach (var item in YieldAsync(Enumerable.Range((i + 1) * 100, 10)))
+        {
+            yield return item;
+        }
+    }
+
+    public static async IAsyncEnumerable<int> AsyncProducerIxAsync(int i, int index)
+    {
+        await foreach (var item in YieldAsync(Enumerable.Range(((index + 1) * 1000) + (i + 1) * 100, 10)))
+        {
+            yield return item;
+        }
+    }
+
+    private static async IAsyncEnumerable<T> YieldAsync<T>(IEnumerable<T> input)
+    {
+        await Task.Delay(1000);
+
+        foreach (var item in input)
+        {
+            yield return item;
+        }
+    }
 }

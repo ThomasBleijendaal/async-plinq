@@ -33,10 +33,6 @@ internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
             {
                 Completion = ReadEnumerableAsync();
             }
-            else
-            {
-                throw new InvalidOperationException("Enumeration already started");
-            }
         }
     }
 

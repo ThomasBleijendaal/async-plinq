@@ -21,11 +21,11 @@ internal static class Sim6Linq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 1, start, end));
+                inputData.Add(new Timing(i, 1, true, start, end));
 
                 return i;
             })
-            .Where(i =>
+            .Where((i, index) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
@@ -33,9 +33,9 @@ internal static class Sim6Linq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 2, start, end));
+                inputData.Add(new Timing(i, 2, index % 2 == 1, start, end));
 
-                return true;
+                return index % 2 == 1;
             })
             .Select(i =>
             {
@@ -45,11 +45,11 @@ internal static class Sim6Linq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 3, start, end));
+                inputData.Add(new Timing(i, 3, true, start, end));
 
                 return i;
             })
-            .Where(i =>
+            .Where((i, index) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
@@ -57,9 +57,9 @@ internal static class Sim6Linq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 4, start, end));
+                inputData.Add(new Timing(i, 4, index % 2 == 1, start, end));
 
-                return true;
+                return index % 2 == 1;
             })
             .ToArray();
 

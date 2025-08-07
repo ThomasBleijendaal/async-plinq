@@ -23,7 +23,7 @@ internal static class Sim8AsyncPlinq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 1, start, end));
+                inputData.Add(new Timing(i, 1, true, start, end));
 
                 return i;
             }, 4)
@@ -35,7 +35,7 @@ internal static class Sim8AsyncPlinq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 2, start, end));
+                inputData.Add(new Timing(i, 2, true, start, end));
 
                 return i;
             }, 2)
@@ -47,7 +47,7 @@ internal static class Sim8AsyncPlinq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 3, start, end));
+                inputData.Add(new Timing(i, 3, true, start, end));
 
                 return i;
             }, 2)
@@ -59,7 +59,7 @@ internal static class Sim8AsyncPlinq
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 4, start, end));
+                inputData.Add(new Timing(i, 4, true, start, end));
 
                 return i;
             }, 2)

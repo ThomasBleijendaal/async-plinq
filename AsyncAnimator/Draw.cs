@@ -21,6 +21,8 @@ internal static class Draw
         var maxStages = inputData.MaxBy(x => x.Stage)!.Stage;
         var maxItems = inputData.MaxBy(x => x.Item)!.Item;
 
+        var items = inputData.Select(x => x.Item).Distinct().ToArray();
+
         var frameTime = 60;
 
         var image = new Image<Rgba32>(800, Height, Color.White);
@@ -45,12 +47,20 @@ internal static class Draw
             gifMetadata.FrameDelay = 0;
 
             Stages(frame, maxStages);
-            for (var item = 1; item <= maxItems; item++)
+            foreach (var item in items)
             {
-                var filtered = inputData.Where(x => x.Item == item);
+                var filtered =
+                    inputData
+                        .Where(x => x.Item == item);
 
-                var data = filtered.Where(x => x.Exit > currentTime).OrderBy(x => x.Entry).FirstOrDefault()
-                    ?? filtered.OrderByDescending(x => x.Exit).First();
+                var data =
+                    filtered
+                        .Where(x => x.Exit > currentTime)
+                        .OrderBy(x => x.Entry)
+                        .FirstOrDefault() ??
+                    filtered
+                        .OrderByDescending(x => x.Exit)
+                        .First();
 
                 Item(frame, data, currentTime);
             }
@@ -101,7 +111,7 @@ internal static class Draw
         var dt = item.Exit.TotalSeconds - item.Entry.TotalSeconds;
         var pt = progress.TotalSeconds - item.Entry.TotalSeconds;
 
-        var percentage = ((dt == pt) ? 0 : (pt / dt));
+        var percentage = Math.Clamp(((dt == pt) ? 0 : (pt / dt)), 0, 1);
 
         var pos = item switch
         {
@@ -116,7 +126,9 @@ internal static class Draw
         var rgb = ColorSpaceConverter.ToRgb(hsv);
         var color = Color.FromRgb((byte)(rgb.R * 255), (byte)(rgb.G * 255), (byte)(rgb.B * 255));
 
-        var pen = Pens.Solid(color, 10);
+        var width = item.Continues ? 10f : (float)(3 + (7 * (1.0 - percentage)));
+
+        var pen = Pens.Solid(color, width);
 
         image.Mutate(x => x.DrawLine(pen, pos, pos));
     }

@@ -7,19 +7,19 @@ public static partial class AsyncPlinqExtensions
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, Task<bool>> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate, maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
 
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, int, Task<bool>> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate, maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
     }
 
@@ -28,37 +28,37 @@ public static partial class AsyncPlinqExtensions
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, bool> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate.MakeAsync(), maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
 
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, int, bool> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate.MakeAsync(), maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
 
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, Task<bool>> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate, maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
 
         public IAsyncEnumerable<TInput> WhereAsync(
             Func<TInput, int, Task<bool>> predicate,
             int? maxDegreeOfParallelism = null,
-            CancellationToken? token = null)
+            CancellationToken token = default)
         {
             var transform = BlockBuilder.Create(predicate, maxDegreeOfParallelism);
-            return PipelineBuilder.CreateEnumerable(source, transform, token ?? default);
+            return PipelineBuilder.CreateEnumerable(source, transform, token);
         }
     }
 }

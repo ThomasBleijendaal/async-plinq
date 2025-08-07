@@ -22,7 +22,7 @@ internal static class Sim4AsyncExtensions
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 1, start, end));
+                inputData.Add(new Timing(i, 1, true, start, end));
 
                 return i;
             });
@@ -36,9 +36,9 @@ internal static class Sim4AsyncExtensions
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
-                inputData.Add(new Timing(i, 2, start, end));
+                inputData.Add(new Timing(i, 2, i % 2 == 1, start, end));
 
-                return true;
+                return (i, i % 2 == 1);
             }, 3);
 
         await Task.Delay(1000);

@@ -13,9 +13,10 @@ internal static class BlockBuilder
     }
 
     public static Block<TInput, TOutput> Create<TInput, TOutput>(
-        Func<TInput, int, Task<TOutput>> selector,
+        Func<TInput, int, CancellationToken, Task<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
+        var cts = new CancellationTokenSource();
         var funcCounter = new FuncCounter<TInput, TOutput>(selector);
         return Create<TInput, TOutput>(funcCounter.InvokeAsync, maxDegreeOfParallelism);
     }
@@ -33,6 +34,22 @@ internal static class BlockBuilder
         int? maxDegreeOfParallelism = null)
     {
         var funcCounter = new FuncCounter<TInput, IEnumerable<TOutput>>(selector);
+        return Create<TInput, TOutput>(funcCounter.InvokeAsync, maxDegreeOfParallelism);
+    }
+
+    public static Block<TInput, TOutput> Create<TInput, TOutput>(
+        Func<TInput, IAsyncEnumerable<TOutput>> selector,
+        int? maxDegreeOfParallelism = null)
+    {
+        var transform = new TransformManyBlock<TInput, TOutput>(selector, CreateOptions(maxDegreeOfParallelism));
+        return new(transform, transform);
+    }
+
+    public static Block<TInput, TOutput> Create<TInput, TOutput>(
+        Func<TInput, int, IAsyncEnumerable<TOutput>> selector,
+        int? maxDegreeOfParallelism = null)
+    {
+        var funcCounter = new AsyncEnumerableCounter<TInput, TOutput>(selector);
         return Create<TInput, TOutput>(funcCounter.InvokeAsync, maxDegreeOfParallelism);
     }
 
