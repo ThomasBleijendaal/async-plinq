@@ -2,12 +2,12 @@
 
 namespace AsyncPlinq.Tests;
 
-[Collection("1")]
-public class UnitTest1
+[Collection("2")]
+public class UnitTest2
 {
     private readonly ITestOutputHelper _output;
 
-    public UnitTest1(ITestOutputHelper output)
+    public UnitTest2(ITestOutputHelper output)
     {
         _output = output;
     }

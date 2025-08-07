@@ -1,5 +1,4 @@
-﻿using SixLabors.Fonts;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.ColorSpaces;
 using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -24,7 +23,7 @@ internal static class Draw
 
         var frameTime = 60;
 
-        var image = new Image<Rgba32>(800, Draw.Height, Color.White);
+        var image = new Image<Rgba32>(800, Height, Color.White);
 
         var metadata = image.Metadata.GetGifMetadata();
         metadata.RepeatCount = 0;
@@ -32,8 +31,8 @@ internal static class Draw
         var gifMetadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
         gifMetadata.FrameDelay = 0;
 
-        SystemFonts.TryGet("Consolas", out var fontFamily);
-        var font = fontFamily.CreateFont(10, FontStyle.Regular);
+        //SystemFonts.TryGet("Consolas", out var fontFamily);
+        //var font = fontFamily.CreateFont(10, FontStyle.Regular);
 
         var maxFrames = maxTime.TotalMilliseconds / frameTime;
         for (var i = 0; i < maxFrames; i++)

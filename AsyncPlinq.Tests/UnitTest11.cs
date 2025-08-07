@@ -2,22 +2,22 @@
 
 namespace AsyncPlinq.Tests;
 
-[Collection("1")]
-public class UnitTest1
+[Collection("11")]
+public class UnitTest11
 {
     private readonly ITestOutputHelper _output;
 
-    public UnitTest1(ITestOutputHelper output)
+    public UnitTest11(ITestOutputHelper output)
     {
         _output = output;
     }
 
     [Fact]
-    public async Task SelectTestAsync()
+    public async Task WhereTest3Async()
     {
         int[] input = [1, 2, 3, 4];
 
-        var output = input.SelectAsync(M.AsyncSelector);
+        var output = input.WhereAsync(M.AsyncPredicate).WhereAsync(M.SyncPredicate);
 
         await foreach (var item in output)
         {

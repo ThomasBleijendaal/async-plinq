@@ -8,4 +8,9 @@ internal static class BlockOptions
     {
         PropagateCompletion = true
     };
+
+    public static readonly ExecutionDataflowBlockOptions MaxParallelOptions = new()
+    {
+        MaxDegreeOfParallelism = 32
+    };
 }

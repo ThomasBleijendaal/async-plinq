@@ -13,6 +13,6 @@ internal class FuncCounter<TInput, TOutput>
     public async Task<TOutput> InvokeAsync(TInput input)
     {
         var currentIndex = Interlocked.Increment(ref _index);
-        return await _method.Invoke(input, currentIndex);
+        return await _method.Invoke(input, currentIndex).ConfigureAwait(false);
     }
 }

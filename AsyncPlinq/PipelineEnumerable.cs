@@ -72,12 +72,12 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
             Complete();
         }
 
-        if (!await SourceBlock.OutputAvailableAsync())
+        if (!await SourceBlock.OutputAvailableAsync().ConfigureAwait(false))
         {
             return false;
         }
 
-        Current = await SourceBlock.ReceiveAsync();
+        Current = await SourceBlock.ReceiveAsync().ConfigureAwait(false);
 
         return true;
     }

@@ -33,6 +33,10 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
             {
                 Completion = ReadEnumerableAsync();
             }
+            else
+            {
+                throw new InvalidOperationException("Enumeration already started");
+            }
         }
     }
 
@@ -79,7 +83,7 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 
         foreach (var item in _source)
         {
-            await _target.SendAsync(item);
+            await _target.SendAsync(item).ConfigureAwait(false);
         }
 
         _target.Complete();
