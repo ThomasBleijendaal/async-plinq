@@ -14,5 +14,6 @@ await Sim8AsyncPlinq.RunAsync();
 
 // TODO: simulate selectmany
 // TODO: simulate where
+// TODO: simulate cancellations
 
 Console.WriteLine("Done");

@@ -65,10 +65,7 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
     {
     }
 
-    public bool ReserveMessage(DataflowMessageHeader messageHeader, ITargetBlock<T> target)
-    {
-        return false;
-    }
+    public bool ReserveMessage(DataflowMessageHeader messageHeader, ITargetBlock<T> target) => false;
 
     private async Task ReadEnumerableAsync(CancellationToken token)
     {

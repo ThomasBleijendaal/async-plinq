@@ -13,6 +13,8 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
     private readonly Lock _completionLock = new();
     private bool _isCompleted;
 
+    private bool _enumerationStarted = false;
+
     public PipelineEnumerable(
         ISourceBlock<T> sourceBlock,
         IUpstreamBlock? upstreamBlock,
@@ -51,7 +53,7 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
     public T Current
     {
-        get => _current ?? throw new InvalidOperationException("No item");
+        get => _current ?? throw new InvalidOperationException("Enumeration not started yet");
         private set => _current = value;
     }
 
@@ -71,6 +73,18 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
     public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
+        EnsureEnumerationNotStarted();
+
+        lock (_completionLock)
+        {
+            EnsureEnumerationNotStarted();
+
+            if (!_enumerationStarted)
+            {
+                _enumerationStarted = true;
+            }
+        }
+
         return this;
     }
 
@@ -89,5 +103,13 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
         Current = await SourceBlock.ReceiveAsync().ConfigureAwait(false);
 
         return true;
+    }
+
+    private void EnsureEnumerationNotStarted()
+    {
+        if (_enumerationStarted)
+        {
+            throw new InvalidOperationException("Enumeration already started");
+        }
     }
 }
