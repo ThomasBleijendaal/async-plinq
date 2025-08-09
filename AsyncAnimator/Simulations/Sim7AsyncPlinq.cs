@@ -27,7 +27,7 @@ internal static class Sim7AsyncPlinq
 
                 return i;
             }, 2)
-            .WhereAsync(async (i, index) =>
+            .WhereAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
@@ -51,7 +51,7 @@ internal static class Sim7AsyncPlinq
 
                 return i;
             }, 1)
-            .WhereAsync(async (i, index) =>
+            .WhereAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 

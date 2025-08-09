@@ -1,26 +1,33 @@
 ﻿using System.Threading.Tasks.Dataflow;
+using AsyncPlinq;
 
-namespace AsyncPlinq;
+namespace AsyncPlinq.Dataflow;
 
 internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>, IUpstreamBlock
 {
     private T? _current;
     private readonly IUpstreamBlock? _upstreamBlock;
 
+    private readonly CancellationTokenSource? _cts;
+
     private readonly Lock _completionLock = new();
     private bool _isCompleted;
 
     public PipelineEnumerable(
         ISourceBlock<T> sourceBlock,
-        IUpstreamBlock? upstreamBlock)
+        IUpstreamBlock? upstreamBlock,
+        CancellationTokenSource? cts)
     {
         SourceBlock = sourceBlock;
         _upstreamBlock = upstreamBlock;
+        _cts = cts;
     }
 
     public ISourceBlock<T> SourceBlock { get; }
 
-    public void Complete()
+    public void Complete() => Complete(default);
+
+    public void Complete(CancellationToken token)
     {
         lock (_completionLock)
         {
@@ -35,7 +42,7 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
             }
             else
             {
-                _upstreamBlock.Complete();
+                _upstreamBlock.Complete(token);
             }
 
             _isCompleted = true;
@@ -50,6 +57,8 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
     public async ValueTask DisposeAsync()
     {
+        _cts?.Cancel();
+
         _current = default;
 
         SourceBlock.Complete();

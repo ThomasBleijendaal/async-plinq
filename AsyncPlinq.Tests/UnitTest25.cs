@@ -18,28 +18,24 @@ public class UnitTest25
     {
         int[] input = [1, 2, 3, 4];
 
-        var canceledTasks = new ConcurrentBag<int>();
+        var canceled = new ConcurrentBag<int>();
 
-        var output = input.SelectAsync(async (i, index, token) =>
+        var output = await input.SelectAsync(async (i, index, ct) =>
         {
             try
             {
-                await Task.Delay(index * 1000, token);
+                await Task.Delay(i * 1000, ct);
             }
             catch
             {
-                canceledTasks.Add(index);
+                canceled.Add(i);
             }
 
             return i;
+        }).FirstOrDefaultAsync();
 
-        }, 10);
+        await Task.Delay(1000);
 
-        await foreach (var item in output)
-        {
-            _output.WriteLine(item.ToString());
-        }
-
-        Assert.True(canceledTasks.OrderBy(x => x).SequenceEqual([1, 2, 3]));
+        Assert.True(canceled.Order().SequenceEqual([2, 3, 4]));
     }
 }

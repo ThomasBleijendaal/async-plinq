@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks.Dataflow;
 
-namespace AsyncPlinq;
+namespace AsyncPlinq.Dataflow;
 
 internal static class BlockOptions
 {

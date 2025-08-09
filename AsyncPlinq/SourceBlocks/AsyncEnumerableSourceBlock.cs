@@ -1,44 +1,44 @@
 ﻿using System.Threading.Tasks.Dataflow;
+using AsyncPlinq;
+using AsyncPlinq.Dataflow;
 
-namespace AsyncPlinq;
+namespace AsyncPlinq.SourceBlocks;
 
-internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
+internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 {
-    private readonly IEnumerable<T> _source;
+    private readonly IAsyncEnumerable<T> _source;
 
     private readonly TaskCompletionSource _tcs;
-    private readonly CancellationTokenSource _cts;
+    private CancellationTokenSource? _cts;
 
     private ITargetBlock<T>? _target;
 
-    public EnumerableSourceBlock(
-        IEnumerable<T> source,
-        CancellationToken token)
+    public AsyncEnumerableSourceBlock(IAsyncEnumerable<T> source)
     {
         _source = source;
 
         _tcs = new();
         Completion = _tcs.Task;
-
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
     }
 
     public Task Completion { get; private set; }
 
-    public void Complete()
+    public void Complete() => Complete(default);
+
+    public void Complete(CancellationToken token)
     {
         lock (_tcs)
         {
             if (Completion == _tcs.Task)
             {
-                Completion = ReadEnumerableAsync();
+                Completion = ReadEnumerableAsync(token);
             }
         }
     }
 
     public ValueTask DisposeAsync()
     {
-        _cts.Cancel();
+        _cts?.Cancel();
 
         return ValueTask.CompletedTask;
     }
@@ -70,17 +70,28 @@ internal class EnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
         return false;
     }
 
-    private async Task ReadEnumerableAsync()
+    private async Task ReadEnumerableAsync(CancellationToken token)
     {
         if (_target == null)
         {
             throw new InvalidOperationException("No target");
         }
 
-        foreach (var item in _source)
+        if (token != default)
         {
-            await _target.SendAsync(item).ConfigureAwait(false);
+            _cts ??= CancellationTokenSource.CreateLinkedTokenSource(token);
         }
+
+        var ct = _cts?.Token ?? default;
+
+        try
+        {
+            await foreach (var item in _source.WithCancellation(ct).ConfigureAwait(false))
+            {
+                await _target.SendAsync(item, ct).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) { }
 
         _target.Complete();
 

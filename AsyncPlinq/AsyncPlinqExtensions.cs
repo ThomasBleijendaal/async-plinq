@@ -21,4 +21,7 @@ public static partial class AsyncPlinqExtensions
 
     internal static Func<TInput1, TInput2, Task<TOutput>> MakeAsync<TInput1, TInput2, TOutput>(this Func<TInput1, TInput2, TOutput> method)
         => (input1, input2) => Task.FromResult(method.Invoke(input1, input2));
+
+    internal static Func<TInput1, TInput2, TInput3, Task<TOutput>> MakeAsync<TInput1, TInput2, TInput3, TOutput>(this Func<TInput1, TInput2, TInput3, TOutput> method)
+        => (input1, input2, input3) => Task.FromResult(method.Invoke(input1, input2, input3));
 }

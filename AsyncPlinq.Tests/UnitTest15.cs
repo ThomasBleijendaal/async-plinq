@@ -17,7 +17,7 @@ public class UnitTest15
     {
         int[] input = [1, 2, 3, 4];
 
-        var output = input.ToAsyncEnumerable().Select(M.AsyncSelectorCt).Where(M.AsyncPredicateCt);
+        var output = input.ToAsyncEnumerable().Select(M.AsyncSelectorVtCt).Where(M.AsyncPredicateVtCt);
 
         await foreach (var item in output)
         {

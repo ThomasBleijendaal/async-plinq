@@ -1,34 +1,34 @@
-﻿namespace AsyncPlinq;
+﻿using AsyncPlinq.SourceBlocks;
+
+namespace AsyncPlinq.Dataflow;
 
 internal static class PipelineBuilder
 {
     public static PipelineEnumerable<TOutput> CreateEnumerable<TInput, TOutput>(
         IEnumerable<TInput> source,
-        Block<TInput, TOutput> block,
-        CancellationToken token)
+        Block<TInput, TOutput> block)
     {
-        var input = new EnumerableSourceBlock<TInput>(source, token);
+        var input = new EnumerableSourceBlock<TInput>(source);
         input.LinkTo(block.Input, BlockOptions.DefaultOptions);
 
-        return new PipelineEnumerable<TOutput>(block.Output, input);
+        return new PipelineEnumerable<TOutput>(block.Output, input, block.Cts);
     }
 
     public static PipelineEnumerable<TOutput> CreateEnumerable<TInput, TOutput>(
         IAsyncEnumerable<TInput> source,
-        Block<TInput, TOutput> block,
-        CancellationToken token)
+        Block<TInput, TOutput> block)
     {
         if (source is PipelineEnumerable<TInput> pipeline)
         {
             pipeline.SourceBlock.LinkTo(block.Input, BlockOptions.DefaultOptions);
-            return new PipelineEnumerable<TOutput>(block.Output, pipeline);
+            return new PipelineEnumerable<TOutput>(block.Output, pipeline, block.Cts);
         }
         else
         {
-            var input = new AsyncEnumerableSourceBlock<TInput>(source, token);
+            var input = new AsyncEnumerableSourceBlock<TInput>(source);
             input.LinkTo(block.Input, BlockOptions.DefaultOptions);
 
-            return new PipelineEnumerable<TOutput>(block.Output, input);
+            return new PipelineEnumerable<TOutput>(block.Output, input, block.Cts);
         }
     }
 }
