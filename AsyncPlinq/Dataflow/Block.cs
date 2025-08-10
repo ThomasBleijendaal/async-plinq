@@ -4,5 +4,5 @@ namespace AsyncPlinq.Dataflow;
 
 internal record Block<TInput, TOutput>(
     ITargetBlock<TInput> Input,
-    ISourceBlock<TOutput> Output,
+    IReceivableSourceBlock<TOutput> Output,
     CancellationTokenSource? Cts = null);

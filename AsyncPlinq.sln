@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncPlinq.Tests", "AsyncPl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncAnimator", "AsyncAnimator\AsyncAnimator.csproj", "{344CA890-B904-4E0D-AADF-78889F5BC854}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncPlinq.Benchmarks", "AsyncPlinq.Benchmarks\AsyncPlinq.Benchmarks.csproj", "{0DEB26DC-84DE-41E9-B5A9-ED7347B9E777}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{344CA890-B904-4E0D-AADF-78889F5BC854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{344CA890-B904-4E0D-AADF-78889F5BC854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{344CA890-B904-4E0D-AADF-78889F5BC854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DEB26DC-84DE-41E9-B5A9-ED7347B9E777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DEB26DC-84DE-41E9-B5A9-ED7347B9E777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DEB26DC-84DE-41E9-B5A9-ED7347B9E777}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DEB26DC-84DE-41E9-B5A9-ED7347B9E777}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

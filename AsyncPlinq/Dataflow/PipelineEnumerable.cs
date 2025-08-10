@@ -8,7 +8,7 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
     private T? _current;
     private readonly IUpstreamBlock? _upstreamBlock;
 
-    private readonly CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts;
 
     private readonly Lock _completionLock = new();
     private bool _isCompleted;
@@ -16,7 +16,7 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
     private bool _enumerationStarted = false;
 
     public PipelineEnumerable(
-        ISourceBlock<T> sourceBlock,
+        IReceivableSourceBlock<T> sourceBlock,
         IUpstreamBlock? upstreamBlock,
         CancellationTokenSource? cts)
     {
@@ -25,7 +25,7 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
         _cts = cts;
     }
 
-    public ISourceBlock<T> SourceBlock { get; }
+    public IReceivableSourceBlock<T> SourceBlock { get; }
 
     public void Complete() => Complete(default);
 
@@ -79,6 +79,18 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
         {
             EnsureEnumerationNotStarted();
 
+            if (cancellationToken != default)
+            {
+                if (_cts == null)
+                {
+                    _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                }
+                else
+                {
+                    _cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
+                }
+            }
+
             if (!_enumerationStarted)
             {
                 _enumerationStarted = true;
@@ -95,13 +107,17 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
             Complete();
         }
 
-        if (!await SourceBlock.OutputAvailableAsync().ConfigureAwait(false))
+        if (!await SourceBlock.OutputAvailableAsync(_cts?.Token ?? default).ConfigureAwait(false))
         {
             return false;
         }
 
-        Current = await SourceBlock.ReceiveAsync().ConfigureAwait(false);
+        if (!SourceBlock.TryReceive(out var item))
+        {
+            return false;
+        }
 
+        Current = item;
         return true;
     }
 
