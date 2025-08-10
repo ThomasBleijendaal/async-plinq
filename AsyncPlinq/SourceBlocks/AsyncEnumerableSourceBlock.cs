@@ -76,10 +76,10 @@ internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
 
         if (token != default)
         {
-            _cts ??= CancellationTokenSource.CreateLinkedTokenSource(token);
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
         }
 
-        var ct = _cts?.Token ?? default;
+        var ct = _cts?.Token ?? token;
 
         try
         {

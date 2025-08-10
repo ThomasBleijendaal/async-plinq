@@ -111,6 +111,8 @@ internal static class BlockBuilder
         => new()
         {
             MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
-            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism)
+            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism),
+            // this can be true because it's inherently a linear pipe that can only be executed once
+            SingleProducerConstrained = true
         };
 }

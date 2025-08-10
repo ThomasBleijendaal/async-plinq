@@ -1,22 +1,21 @@
 ﻿using System.Threading.Tasks.Dataflow;
 using AsyncPlinq;
 using BenchmarkDotNet.Attributes;
-using Microsoft.VSDiagnostics;
 
 namespace AsyncPlinq.Benchmarks;
 
-//[MemoryDiagnoser]
-[DotNetObjectAllocDiagnoser]
-[DotNetObjectAllocJobConfiguration(1)]
+[MemoryDiagnoser]
+//[DotNetObjectAllocDiagnoser]
+//[DotNetObjectAllocJobConfiguration(1)]
 public class Pipeline
 {
-    //[Params(1, 100, 10000)]
-    [Params(100)]
+    [Params(10, 100, 1000)]
     public int NumberOfItems { get; set; }
 
-    protected readonly int[] _data;
+    protected int[] _data = [];
 
-    public Pipeline()
+    [GlobalSetup]
+    public void Setup()
     {
         _data = [.. Enumerable.Range(0, NumberOfItems)];
     }
@@ -38,7 +37,7 @@ public class Pipeline
         var data1 = await Task.WhenAll(_data
             .Select(async x =>
             {
-                await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
                 return (x, x % 2 == 0);
             }));
 
@@ -46,7 +45,7 @@ public class Pipeline
 
         var data = await Task.WhenAll(data2.Select(async x =>
         {
-            await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
             return x * 10;
         }));
 
@@ -59,12 +58,12 @@ public class Pipeline
         var data = await _data.ToAsyncEnumerable()
             .Where(async (x, ct) =>
             {
-                await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
                 return x % 2 == 0;
             })
             .Select(async (x, ix, ct) =>
             {
-                await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
                 return x * 10;
             })
             .ToArrayAsync();
@@ -78,12 +77,12 @@ public class Pipeline
         var data = await _data
             .WhereAsync(async x =>
             {
-                await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
                 return x % 2 == 0;
             })
             .SelectAsync(async x =>
             {
-                await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
                 return x * 10;
             })
             .ToArrayAsync();
@@ -96,12 +95,12 @@ public class Pipeline
     {
         var whereBlock = new TransformManyBlock<int, int>(async x =>
         {
-            await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
             return (x % 2 == 0) ? [x] : [];
         }, new() { MaxDegreeOfParallelism = 5 });
         var selectBlock = new TransformBlock<int, int>(async x =>
         {
-            await Task.Delay(TimeSpan.FromMicroseconds(0.001));
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
             return x * 10;
         }, new() { MaxDegreeOfParallelism = 5 });
 

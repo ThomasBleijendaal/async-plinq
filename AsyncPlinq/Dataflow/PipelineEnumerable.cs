@@ -102,6 +102,14 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
     public async ValueTask<bool> MoveNextAsync()
     {
+        // if the source is faster, we should be able to receive some messages without having to wait for it
+        if (SourceBlock.TryReceive(out var fastItem))
+        {
+            Current = fastItem;
+            return true;
+        }
+
+        // if we have not completed yet, signal completion to the upstream blocks to send the data downstream
         if (!_isCompleted)
         {
             Complete();
