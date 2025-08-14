@@ -2,5 +2,5 @@
 
 internal static class Sim
 {
-    public static int Timeout() => Random.Shared.Next(200, 300);
+    public static int Timeout() => Random.Shared.Next(100, 400);
 }
