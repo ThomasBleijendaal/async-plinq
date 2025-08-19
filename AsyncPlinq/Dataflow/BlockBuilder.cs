@@ -18,7 +18,7 @@ internal static class BlockBuilder
         Func<TInput, int, CancellationToken, Task<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var wrapper = new FuncWrapper<TInput, TOutput>(selector);
+        var wrapper = new FuncWrapper<TInput, Task<TOutput>>(selector);
         var transform = CreateSelect<TInput, TOutput>(wrapper.InvokeAsync, maxDegreeOfParallelism);
         return new(transform, transform, wrapper.Cts);
     }
@@ -40,7 +40,7 @@ internal static class BlockBuilder
         Func<TInput, int, CancellationToken, Task<IEnumerable<TOutput>>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var wrapper = new FuncWrapper<TInput, IEnumerable<TOutput>>(selector);
+        var wrapper = new FuncWrapper<TInput, Task<IEnumerable<TOutput>>>(selector);
         var transform = CreateSelectMany<TInput, TOutput>(wrapper.InvokeAsync, maxDegreeOfParallelism);
         return new(transform, transform, wrapper.Cts);
     }
@@ -62,7 +62,7 @@ internal static class BlockBuilder
         Func<TInput, int, CancellationToken, IAsyncEnumerable<TOutput>> selector,
         int? maxDegreeOfParallelism = null)
     {
-        var wrapper = new AsyncEnumerableWrapper<TInput, TOutput>(selector);
+        var wrapper = new FuncWrapper<TInput, IAsyncEnumerable<TOutput>>(selector);
         var transform = CreateSelectMany<TInput, TOutput>(wrapper.InvokeAsync, maxDegreeOfParallelism);
         return new(transform, transform, wrapper.Cts);
     }
@@ -84,7 +84,7 @@ internal static class BlockBuilder
         Func<TInput, int, CancellationToken, Task<bool>> predicate,
         int? maxDegreeOfParallelism = null)
     {
-        var wrapper = new FuncWrapper<TInput, bool>(predicate);
+        var wrapper = new FuncWrapper<TInput, Task<bool>>(predicate);
         var transform = CreateWhereBlock<TInput>(wrapper.InvokeAsync, maxDegreeOfParallelism);
         return new(transform, transform, wrapper.Cts);
     }
@@ -107,6 +107,7 @@ internal static class BlockBuilder
             },
             CreateOptions(maxDegreeOfParallelism));
 
+    // TODO: cache per maxDegree?
     private static ExecutionDataflowBlockOptions CreateOptions(int? maxDegreeOfParallelism)
         => new()
         {

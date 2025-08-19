@@ -57,7 +57,6 @@ public static partial class AsyncPlinqExtensions
             return PipelineBuilder.CreateEnumerable(source, transform);
         }
 
-
         public IAsyncEnumerable<TResult> SelectManyAsync<TResult>(
             Func<TInput, Task<IEnumerable<TResult>>> selector,
             int? maxDegreeOfParallelism = null)
@@ -66,9 +65,24 @@ public static partial class AsyncPlinqExtensions
             return PipelineBuilder.CreateEnumerable(source, transform);
         }
 
-
         public IAsyncEnumerable<TResult> SelectManyAsync<TResult>(
             Func<TInput, int, CancellationToken, Task<IEnumerable<TResult>>> selector,
+            int? maxDegreeOfParallelism = null)
+        {
+            var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);
+            return PipelineBuilder.CreateEnumerable(source, transform);
+        }
+
+        public IAsyncEnumerable<TResult> SelectManyAsync<TResult>(
+            Func<TInput, IAsyncEnumerable<TResult>> selector,
+            int? maxDegreeOfParallelism = null)
+        {
+            var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);
+            return PipelineBuilder.CreateEnumerable(source, transform);
+        }
+
+        public IAsyncEnumerable<TResult> SelectManyAsync<TResult>(
+            Func<TInput, int, CancellationToken, IAsyncEnumerable<TResult>> selector,
             int? maxDegreeOfParallelism = null)
         {
             var transform = BlockBuilder.Create(selector, maxDegreeOfParallelism);

@@ -117,11 +117,15 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
         if (!await SourceBlock.OutputAvailableAsync(_cts?.Token ?? default).ConfigureAwait(false))
         {
+            await SourceBlock.Completion;
+
             return false;
         }
 
         if (!SourceBlock.TryReceive(out var item))
         {
+            await SourceBlock.Completion;
+
             return false;
         }
 

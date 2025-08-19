@@ -13,9 +13,9 @@ public static partial class AsyncPlinqExtensions
 
             await Task.WhenAll(source.Select(async (x) =>
             {
+                await semaphore.WaitAsync(token);
                 try
                 {
-                    await semaphore.WaitAsync(token);
                     await selector.Invoke(x);
                 }
                 finally
@@ -28,9 +28,6 @@ public static partial class AsyncPlinqExtensions
 
     extension<TInput>(IAsyncEnumerable<TInput> source)
     {
-        public Task WhenAllAsync(CancellationToken token = default)
-        {
-            return source.ToArrayAsync(token).AsTask();
-        }
+        public Task WhenAllAsync(CancellationToken token = default) => source.ToArrayAsync(token).AsTask();
     }
 }

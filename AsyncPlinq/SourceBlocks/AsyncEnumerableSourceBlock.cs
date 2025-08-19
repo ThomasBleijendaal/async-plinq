@@ -61,9 +61,7 @@ internal class AsyncEnumerableSourceBlock<T> : ISourceBlock<T>, IUpstreamBlock
         return DummyDisposable.Dummy;
     }
 
-    public void ReleaseReservation(DataflowMessageHeader messageHeader, ITargetBlock<T> target)
-    {
-    }
+    public void ReleaseReservation(DataflowMessageHeader messageHeader, ITargetBlock<T> target) { }
 
     public bool ReserveMessage(DataflowMessageHeader messageHeader, ITargetBlock<T> target) => false;
 
