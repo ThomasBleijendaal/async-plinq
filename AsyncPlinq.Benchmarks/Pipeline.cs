@@ -9,7 +9,7 @@ namespace AsyncPlinq.Benchmarks;
 //[DotNetObjectAllocJobConfiguration(1)]
 public class Pipeline
 {
-    [Params(10, 100, 1000)]
+    [Params(10, 100)]
     public int NumberOfItems { get; set; }
 
     protected int[] _data = [];

@@ -19,6 +19,6 @@ public class UnitTest17
 
         var output = await input.SelectAsync(M.AsyncSelector).WhereAsync(M.AsyncPredicate).FirstOrDefaultAsync();
 
-        Assert.True(output == 2);
+        Assert.True(output == 2 || output == 4);
     }
 }

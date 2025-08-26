@@ -4,6 +4,13 @@ public static partial class AsyncPlinqExtensions
 {
     extension<TInput>(IEnumerable<TInput> source)
     {
+        /// <summary>
+        /// Runs the given selector in parallel.
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="maxDegreeOfParallelism"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task WhenAllAsync(
             Func<TInput, Task> selector,
             int maxDegreeOfParallelism = 5,
@@ -28,6 +35,11 @@ public static partial class AsyncPlinqExtensions
 
     extension<TInput>(IAsyncEnumerable<TInput> source)
     {
+        /// <summary>
+        /// Completes the given enumerable.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public Task WhenAllAsync(CancellationToken token = default) => source.ToArrayAsync(token).AsTask();
     }
 }

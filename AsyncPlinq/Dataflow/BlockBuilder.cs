@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks.Dataflow;
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks.Dataflow;
 using AsyncPlinq;
 using AsyncPlinq.Wrappers;
 
@@ -107,13 +108,25 @@ internal static class BlockBuilder
             },
             CreateOptions(maxDegreeOfParallelism));
 
-    // TODO: cache per maxDegree?
+    private static readonly ConcurrentDictionary<int, ExecutionDataflowBlockOptions> Options = new();
+
     private static ExecutionDataflowBlockOptions CreateOptions(int? maxDegreeOfParallelism)
-        => new()
+    {
+        var maxDop = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism;
+
+        if (Options.TryGetValue(maxDop, out var options))
         {
-            MaxDegreeOfParallelism = maxDegreeOfParallelism ?? AsyncPlinq.DefaultMaxDegreeOfParallelism,
-            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDegreeOfParallelism),
+            return options;
+        }
+
+        return Options[maxDop] = new()
+        {
+            MaxDegreeOfParallelism = maxDop,
+            BoundedCapacity = AsyncPlinq.BoundedCapacity(maxDop),
             // this can be true because it's inherently a linear pipe that can only be executed once
-            SingleProducerConstrained = true
+            SingleProducerConstrained = true,
+            // we don't care about order as we want max throughput
+            EnsureOrdered = false
         };
+    }
 }

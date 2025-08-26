@@ -17,6 +17,6 @@ public class UnitTest3
     {
         var output = await M.InfiniteItems(_output).SelectAsync(M.AsyncSelector).WhereAsync(M.AsyncPredicate).FirstOrDefaultAsync();
 
-        Assert.True(output == 2);
+        Assert.True(output % 2 == 0);
     }
 }

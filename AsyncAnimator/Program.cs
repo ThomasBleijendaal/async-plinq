@@ -12,6 +12,7 @@ await Sim5AsyncPlinq.RunAsync();
 Sim6Linq.Run();
 await Sim7AsyncPlinq.RunAsync();
 await Sim8AsyncPlinq.RunAsync();
+await Sim9AsyncOrderPlinq.RunAsync();
 
 // TODO: simulate selectmany
 // TODO: simulate where
