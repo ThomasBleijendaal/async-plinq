@@ -6,6 +6,7 @@ Console.WriteLine("Start");
 Sim01Linq.Run();
 await Sim02Linq.RunAsync();
 await Sim02LinqChunk.RunAsync();
+await Sim02Plinq.RunAsync();
 await Sim03AsyncLinq.RunAsync();
 await Sim04AsyncExtensions.RunAsync();
 await Sim05AsyncPlinq.RunAsync();
