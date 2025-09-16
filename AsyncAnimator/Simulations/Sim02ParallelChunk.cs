@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim2LinqChunk
+internal static class Sim02LinqChunk
 {
     public static async Task RunAsync()
     {
@@ -64,6 +64,6 @@ internal static class Sim2LinqChunk
 
         await Task.Delay(1000);
 
-        Draw.DrawTimings("sim2a.gif", inputData);
+        Draw.DrawTimings("sim2a.gif", inputData, ["Select", "Where"]);
     }
 }

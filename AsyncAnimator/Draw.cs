@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using SixLabors.Fonts;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.ColorSpaces;
 using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -15,7 +16,7 @@ internal static class Draw
     private const int Offset = 30;
     private const int Width = 80;
 
-    public static void DrawTimings(string name, IReadOnlyCollection<Timing> inputData)
+    public static void DrawTimings(string name, IReadOnlyCollection<Timing> inputData, IReadOnlyList<string> stageNames)
     {
         var maxTime = inputData.MaxBy(x => x.Exit)!.Exit + TimeSpan.FromSeconds(1);
         var maxStages = inputData.MaxBy(x => x.Stage)!.Stage;
@@ -33,9 +34,6 @@ internal static class Draw
         var gifMetadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
         gifMetadata.FrameDelay = 0;
 
-        //SystemFonts.TryGet("Consolas", out var fontFamily);
-        //var font = fontFamily.CreateFont(10, FontStyle.Regular);
-
         var maxFrames = maxTime.TotalMilliseconds / frameTime;
         for (var i = 0; i < maxFrames; i++)
         {
@@ -46,7 +44,7 @@ internal static class Draw
             gifMetadata = frame.Frames.RootFrame.Metadata.GetGifMetadata();
             gifMetadata.FrameDelay = 0;
 
-            Stages(frame, maxStages);
+            Stages(frame, maxStages, stageNames);
             foreach (var item in items)
             {
                 var filtered =
@@ -84,12 +82,16 @@ internal static class Draw
         image.SaveAsGif(name, encoder);
     }
 
-    private static void Stages(Image<Rgba32> image, int maxStages)
+    private static void Stages(Image<Rgba32> image, int maxStages, IReadOnlyList<string> stageNames)
     {
+        SystemFonts.TryGet("Consolas", out var fontFamily);
+        var font = fontFamily.CreateFont(14, FontStyle.Bold);
+
         var size = new SizeF(Width, Height - (Offset * 2));
 
         var offset = new PointF(Offset, Offset);
         var offsetW = new PointF(Offset, 0);
+        var offsetHH = new PointF(0, Offset / 2);
         var w = new SizeF(size.Width, 0);
         var h = new SizeF(0, size.Height);
 
@@ -98,6 +100,8 @@ internal static class Draw
         for (var i = 0; i < maxStages; i++)
         {
             var origin = offset + (i * (offsetW + w));
+
+            image.Mutate(x => x.DrawText(stageNames[i], font, Color.Silver, origin - offsetHH));
 
             image.Mutate(x => x.DrawPolygon(pen, origin, origin + w, origin + size, origin + h));
         }

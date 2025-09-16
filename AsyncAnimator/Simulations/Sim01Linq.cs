@@ -3,23 +3,22 @@ using System.Diagnostics;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim3AsyncLinq
+internal static class Sim01Linq
 {
-    public static async Task RunAsync()
+    public static void Run()
     {
         var inputData = new ConcurrentBag<Timing>();
 
         var simStart = Stopwatch.GetTimestamp();
 
-        await Task.Delay(Sim.Timeout());
+        Thread.Sleep(Sim.Timeout());
 
-        var result = await Enumerable.Range(1, 10)
-            .ToAsyncEnumerable()
-            .Select(async (i, index, ct) =>
+        var result = Enumerable.Range(1, 10)
+            .Select(i =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                await Task.Delay(Sim.Timeout());
+                Thread.Sleep(Sim.Timeout());
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
@@ -27,11 +26,11 @@ internal static class Sim3AsyncLinq
 
                 return i;
             })
-            .Where(async (i, index, ct) =>
+            .Where(i =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                await Task.Delay(Sim.Timeout());
+                Thread.Sleep(Sim.Timeout());
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
@@ -39,10 +38,8 @@ internal static class Sim3AsyncLinq
 
                 return i % 2 == 1;
             })
-            .ToArrayAsync();
+            .ToArray();
 
-        await Task.Delay(1000);
-
-        Draw.DrawTimings("sim3.gif", inputData);
+        Draw.DrawTimings("sim1.gif", inputData, ["Select", "Where"]);
     }
 }

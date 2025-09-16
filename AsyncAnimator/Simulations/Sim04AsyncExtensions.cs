@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim4AsyncExtensions
+internal static class Sim04AsyncExtensions
 {
     public static async Task RunAsync()
     {
@@ -43,7 +43,7 @@ internal static class Sim4AsyncExtensions
 
         await Task.Delay(1000);
 
-        Draw.DrawTimings("sim4.gif", inputData);
+        Draw.DrawTimings("sim4.gif", inputData, ["ToListAsync", "ToListAsync"]);
     }
 
     public static async Task<TResult[]> ToListAsync<TSource, TResult>(

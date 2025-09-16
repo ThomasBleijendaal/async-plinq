@@ -1,68 +1,72 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using AsyncPlinq;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim6Linq
+internal static class Sim09AsyncOrderPlinq
 {
-    public static void Run()
+    public static async Task RunAsync()
     {
-        var inputData = new List<Timing>();
+        var inputData = new ConcurrentBag<Timing>();
 
         var simStart = Stopwatch.GetTimestamp();
 
-        Thread.Sleep(Sim.Timeout());
+        await Task.Delay(Sim.Timeout());
 
-        var result = Enumerable.Range(1, 10)
-            .Select(i =>
+        var result1 = await Enumerable.Range(1, 10)
+            .SelectAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                Thread.Sleep(Sim.Timeout() / 2);
+                await Task.Delay(Sim.Timeout() * (10 - i));
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
                 inputData.Add(new Timing(i, 1, true, start, end));
 
                 return i;
-            })
-            .Where((i, index) =>
+            }, 10)
+            .WhereAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                Thread.Sleep(Sim.Timeout() * 3);
+                await Task.Delay(Sim.Timeout() * (10 - i));
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
                 inputData.Add(new Timing(i, 2, index % 2 == 1, start, end));
 
                 return index % 2 == 1;
-            })
-            .Select(i =>
+            }, 10)
+            .SelectAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                Thread.Sleep(Sim.Timeout() / 2);
+                await Task.Delay(Sim.Timeout() * (10 - i));
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
                 inputData.Add(new Timing(i, 3, true, start, end));
 
                 return i;
-            })
-            .Where((i, index) =>
+            }, 10)
+            .WhereAsync(async (i, index, ct) =>
             {
                 var start = Stopwatch.GetElapsedTime(simStart);
 
-                Thread.Sleep(Sim.Timeout() * 4);
+                await Task.Delay(Sim.Timeout() * (10 - i));
 
                 var end = Stopwatch.GetElapsedTime(simStart);
 
                 inputData.Add(new Timing(i, 4, index % 2 == 1, start, end));
 
                 return index % 2 == 1;
-            })
-            .ToArray();
+            }, 10)
+            .ToArrayAsync();
 
-        Draw.DrawTimings("sim6.gif", inputData);
+        await Task.Delay(1000);
+
+        Draw.DrawTimings("sim9.gif", inputData, ["SelectAsync", "WhereAsync", "SelectAsync", "WhereAsync"]);
     }
 }

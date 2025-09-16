@@ -3,19 +3,16 @@ using AsyncAnimator.Simulations;
 
 Console.WriteLine("Start");
 
-Sim1Linq.Run();
-await Sim2Linq.RunAsync();
-await Sim2LinqChunk.RunAsync();
-await Sim3AsyncLinq.RunAsync();
-await Sim4AsyncExtensions.RunAsync();
-await Sim5AsyncPlinq.RunAsync();
-Sim6Linq.Run();
-await Sim7AsyncPlinq.RunAsync();
-await Sim8AsyncPlinq.RunAsync();
-await Sim9AsyncOrderPlinq.RunAsync();
-
-// TODO: simulate selectmany
-// TODO: simulate where
-// TODO: simulate cancellations
+Sim01Linq.Run();
+await Sim02Linq.RunAsync();
+await Sim02LinqChunk.RunAsync();
+await Sim03AsyncLinq.RunAsync();
+await Sim04AsyncExtensions.RunAsync();
+await Sim05AsyncPlinq.RunAsync();
+Sim06Linq.Run();
+await Sim07AsyncPlinq.RunAsync();
+await Sim08AsyncPlinq.RunAsync();
+await Sim09AsyncOrderPlinq.RunAsync();
+await Sim10SelectMany.RunAsync();
 
 Console.WriteLine("Done");

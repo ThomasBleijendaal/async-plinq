@@ -16,11 +16,11 @@ var output = await input.SelectAsync(i => SomethingAsync(i)).WhereAsync(i => Som
 
 The first query has the following run characteristics:
 
-![One at the time processing of a linq query](./docs/a.gif)
+![One at the time processing of a linq query](./docs/sim1.gif)
 
 while the variant with `SelectAsync` and `WhereAsync` looks more like:
 
-![One at the time processing of a linq query](./docs/b.gif)
+![One at the time processing of a linq query](./docs/sim5.gif)
 
 ## Why this package?
 

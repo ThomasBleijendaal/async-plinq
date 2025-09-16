@@ -4,7 +4,7 @@ using AsyncPlinq;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim7AsyncPlinq
+internal static class Sim07AsyncPlinq
 {
     public static async Task RunAsync()
     {
@@ -67,6 +67,6 @@ internal static class Sim7AsyncPlinq
 
         await Task.Delay(1000);
 
-        Draw.DrawTimings("sim7.gif", inputData);
+        Draw.DrawTimings("sim7.gif", inputData, ["SelectAsync", "WhereAsync", "SelectAsync", "WhereAsync"]);
     }
 }

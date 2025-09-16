@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace AsyncAnimator.Simulations;
 
-internal static class Sim2Linq
+internal static class Sim02Linq
 {
     public static async Task RunAsync()
     {
@@ -46,6 +46,6 @@ internal static class Sim2Linq
 
         await Task.Delay(1000);
 
-        Draw.DrawTimings("sim2.gif", inputData);
+        Draw.DrawTimings("sim2.gif", inputData, ["Select", "Where"]);
     }
 }
