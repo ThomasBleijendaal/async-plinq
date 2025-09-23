@@ -24,6 +24,16 @@ public class Pipeline
     public Task<int[]> LinqPipelineAsync()
     {
         var data = _data
+            .Select(x => x * 10)
+            .ToArray();
+
+        return Task.FromResult(data);
+    }
+
+    [Benchmark]
+    public Task<int[]> LinqPipeline2Async()
+    {
+        var data = _data
             .Where(x => x % 2 == 0)
             .Select(x => x * 10)
             .ToArray();
@@ -33,6 +43,19 @@ public class Pipeline
 
     [Benchmark]
     public async Task<int[]> PlinqPipelineAsync()
+    {
+        var data = await Task.WhenAll(_data
+            .Select(async x =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                return x * 10;
+            }));
+
+        return data;
+    }
+
+    [Benchmark]
+    public async Task<int[]> PlinqPipeline2Async()
     {
         var data1 = await Task.WhenAll(_data
             .Select(async x =>
@@ -56,6 +79,20 @@ public class Pipeline
     public async Task<int[]> AsyncLinqPipelineAsync()
     {
         var data = await _data.ToAsyncEnumerable()
+            .Select(async (x, ix, ct) =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                return x * 10;
+            })
+            .ToArrayAsync();
+
+        return data;
+    }
+
+    [Benchmark]
+    public async Task<int[]> AsyncLinqPipeline2Async()
+    {
+        var data = await _data.ToAsyncEnumerable()
             .Where(async (x, ct) =>
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
@@ -75,6 +112,20 @@ public class Pipeline
     public async Task<int[]> AsyncPlinqPipelineAsync()
     {
         var data = await _data
+            .SelectAsync(async x =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                return x * 10;
+            })
+            .ToArrayAsync();
+
+        return data;
+    }
+
+    [Benchmark]
+    public async Task<int[]> AsyncPlinqPipeline2Async()
+    {
+        var data = await _data
             .WhereAsync(async x =>
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
@@ -92,6 +143,27 @@ public class Pipeline
 
     [Benchmark]
     public async Task<int[]> DataflowPipelineAsync()
+    {
+        var selectBlock = new TransformBlock<int, int>(async x =>
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
+            return x * 10;
+        }, new() { MaxDegreeOfParallelism = 5 });
+
+        foreach (var item in _data)
+        {
+            await selectBlock.SendAsync(item);
+        }
+
+        selectBlock.Complete();
+
+        var data = await selectBlock.ReceiveAllAsync().ToArrayAsync();
+
+        return data;
+    }
+
+    [Benchmark]
+    public async Task<int[]> DataflowPipeline2Async()
     {
         var whereBlock = new TransformManyBlock<int, int>(async x =>
         {

@@ -31,6 +31,11 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
     public void Complete(CancellationToken token)
     {
+        if (_isCompleted)
+        {
+            return;
+        }
+
         lock (_completionLock)
         {
             if (_isCompleted)
@@ -117,14 +122,14 @@ internal class PipelineEnumerable<T> : IAsyncEnumerable<T>, IAsyncEnumerator<T>,
 
         if (!await SourceBlock.OutputAvailableAsync(_cts?.Token ?? default).ConfigureAwait(false))
         {
-            await SourceBlock.Completion;
+            await SourceBlock.Completion.ConfigureAwait(false);
 
             return false;
         }
 
         if (!SourceBlock.TryReceive(out var item))
         {
-            await SourceBlock.Completion;
+            await SourceBlock.Completion.ConfigureAwait(false);
 
             return false;
         }
