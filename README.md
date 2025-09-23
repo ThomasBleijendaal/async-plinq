@@ -1,6 +1,6 @@
 # AsyncPlinq: Async Parallel Linq
 
-[![#](https://img.shields.io/nuget/vpre/AsyncPlinq?style=flat-square)](https://www.nuget.org/packages/AsyncPlinq)
+[![#](https://img.shields.io/nuget/v/AsyncPlinq?style=flat-square)](https://www.nuget.org/packages/AsyncPlinq)
 
 Small library to set up TPL based parallel pipelines using simple LINQ style queries.
 
